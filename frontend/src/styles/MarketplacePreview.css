@@ -1,0 +1,223 @@
+.marketplace-section {
+  padding: 6rem 0;
+  background: radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.08) 0%, rgba(5, 4, 14, 0) 60%);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.marketplace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3.5rem;
+}
+
+@media (max-width: 768px) {
+  .marketplace-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}
+
+.marketplace-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.marketplace-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+}
+
+.marketplace-desc {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 992px) {
+  .properties-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .properties-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.property-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.property-card:hover .property-image-placeholder {
+  transform: scale(1.05);
+}
+
+/* Stylized architectural placeholder representation */
+.property-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.6;
+  background: var(--bg-tertiary);
+  overflow: hidden;
+}
+
+.property-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(13, 11, 35, 0.9) 0%, rgba(30, 27, 75, 0.9) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 10px;
+  position: relative;
+  transition: transform var(--transition-normal);
+}
+
+.property-arch-drawing {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  opacity: 0.65;
+}
+
+.arch-pillar {
+  width: 24px;
+  background: linear-gradient(to top, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.1));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.arch-pillar.tall {
+  height: 90px;
+}
+
+.arch-pillar.medium {
+  height: 70px;
+}
+
+.arch-pillar.short {
+  height: 50px;
+}
+
+.property-card-tag {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(13, 11, 35, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Card details styling */
+.property-details {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.property-row-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.property-builder-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.property-trust-rating {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.property-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.property-card-loc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.property-specs {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.property-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.property-row-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.property-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.btn-card-view {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.property-card:hover .btn-card-view {
+  background: var(--gradient-primary);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.25);
+}

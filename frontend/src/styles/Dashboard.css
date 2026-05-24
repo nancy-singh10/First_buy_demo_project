@@ -1,0 +1,290 @@
+.dashboard-portal {
+  padding: calc(var(--header-height) + 3rem) 0 6rem 0;
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+.db-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1.8fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .db-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.db-left, .db-right {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Header section */
+.db-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.db-title-col h2 {
+  font-size: 2.25rem;
+  font-weight: 800;
+}
+
+.db-title-col p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.btn-back-home {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 8px;
+  transition: var(--transition-fast);
+}
+
+.btn-back-home:hover {
+  background: rgba(59, 130, 246, 0.15);
+  transform: translateX(-2px);
+}
+
+/* Stats Cards block */
+.db-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 576px) {
+  .db-stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.db-stat-card {
+  padding: 1.5rem;
+}
+
+.db-stat-icon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.db-stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.db-stat-icon.purple {
+  background: rgba(168, 85, 247, 0.1);
+  color: var(--accent-purple);
+}
+
+.db-stat-icon.blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+}
+
+.db-stat-icon.green {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.db-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.db-stat-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
+
+/* Document OCR scan segment */
+.db-uploader-box {
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255,255,255,0.08);
+  border-radius: 16px;
+  background: rgba(13, 11, 35, 0.2);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.db-uploader-box:hover {
+  border-color: var(--accent-purple);
+  background: rgba(168, 85, 247, 0.03);
+}
+
+.upload-icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.1);
+  color: var(--accent-purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+/* Ledger / Logs */
+.ledger-card {
+  padding: 1.75rem;
+}
+
+.ledger-header {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.ledger-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ledger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.ledger-item-left {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.ledger-item-icon {
+  font-size: 1.1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ledger-item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.ledger-item-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ledger-item-date {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.ledger-item-right {
+  text-align: right;
+}
+
+.ledger-item-amt {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.ledger-item-status {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* Right Section: Redemption target progress */
+.target-progress-card {
+  padding: 2rem;
+}
+
+.target-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.target-stat-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.target-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.target-stat-val {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.target-progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  margin-bottom: 1.5rem;
+}
+
+.target-progress-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 9999px;
+}
+
+.target-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.target-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
