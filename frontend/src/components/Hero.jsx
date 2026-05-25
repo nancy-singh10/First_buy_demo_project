@@ -1,22 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, Play, ShieldCheck, ArrowRight } from 'lucide-react';
 import '../styles/Hero.css';
 
-export default function Hero({ setCurrentView, setActiveSection }) {
-  
-  const handleScrollTo = (id) => {
-    setActiveSection(id);
-    const element = document.getElementById(id);
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
+export default function Hero() {
+  const navigate = useNavigate();
 
   return (
     <section id="home" className="hero-section">
@@ -41,13 +29,13 @@ export default function Hero({ setCurrentView, setActiveSection }) {
           </p>
           
           <div className="hero-actions">
-            <button className="btn-primary" onClick={() => setCurrentView('dashboard')}>
+            <button className="btn-primary" onClick={() => navigate('/dashboard')}>
               Start earning credits <ArrowRight size={16} />
             </button>
-            <button className="btn-outline" onClick={() => handleScrollTo('properties')}>
+            <button className="btn-outline" onClick={() => navigate('/properties')}>
               Explore properties
             </button>
-            <button className="btn-link-play" onClick={() => setCurrentView('dashboard')}>
+            <button className="btn-link-play" onClick={() => navigate('/dashboard')}>
               <div className="play-icon-wrapper">
                 <Play size={12} fill="currentColor" />
               </div>

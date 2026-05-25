@@ -1,0 +1,219 @@
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: 100px 2rem 2rem 2rem;
+}
+
+.signup-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 960px;
+  width: 100%;
+  min-height: 620px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Left Panel ── */
+.signup-left {
+  position: relative;
+  background: url('/signin_city_bg.png') center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+}
+
+.signup-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(5, 4, 14, 0.3) 0%, rgba(5, 4, 14, 0.85) 100%);
+  z-index: 1;
+}
+
+.signup-left > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Right Panel ── */
+.signup-right {
+  background: rgba(10, 9, 25, 0.95);
+  padding: 2.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.signup-welcome h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+.signup-welcome p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Role Tabs */
+.signup-role-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.role-tab {
+  flex: 1;
+  padding: 0.6rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.role-tab:hover {
+  color: var(--text-primary);
+}
+
+.role-tab.active {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Form fields — reuse signin styles */
+.signup-form-group {
+  margin-bottom: 1rem;
+}
+
+.signup-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.signup-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  transition: border-color var(--transition-fast);
+}
+
+.signup-input-wrapper:focus-within {
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.signup-input-wrapper svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.signup-input-wrapper input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.85rem;
+  width: 100%;
+  outline: none;
+}
+
+.signup-input-wrapper input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn-signup-submit {
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-signup-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.signup-footer-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+}
+
+.signup-footer-text a {
+  color: #818cf8;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 0.25rem;
+}
+
+.signup-footer-text a:hover {
+  text-decoration: underline;
+}
+
+.signup-back-link {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.signup-back-link a {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.signup-back-link a:hover {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .signup-container {
+    grid-template-columns: 1fr;
+  }
+
+  .signup-left {
+    min-height: 180px;
+  }
+
+  .signup-right {
+    padding: 2rem 1.5rem;
+  }
+
+  .signup-role-tabs {
+    flex-wrap: wrap;
+  }
+}

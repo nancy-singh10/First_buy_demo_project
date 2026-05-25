@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import '../styles/Footer.css';
 
@@ -31,30 +32,7 @@ const GithubIcon = ({ size = 16, ...props }) => (
   </svg>
 );
 
-export default function Footer({ setCurrentView, setActiveSection }) {
-  
-  const handleNavClick = (id, type) => {
-    if (type === 'view') {
-      setCurrentView(id);
-      setActiveSection(id);
-    } else {
-      setCurrentView('landing');
-      setActiveSection(id);
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          const headerOffset = 80;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 50);
-    }
-  };
-
+export default function Footer() {
   return (
     <footer className="footer">
       <div className="container">
@@ -63,7 +41,7 @@ export default function Footer({ setCurrentView, setActiveSection }) {
           
           {/* Brand details */}
           <div className="footer-brand">
-            <div className="logo" onClick={() => handleNavClick('home', 'scroll')}>
+            <Link to="/" className="logo">
               <div className="logo-icon-wrapper" style={{ width: '34px', height: '34px' }}>
                 <Home size={18} color="#ffffff" />
               </div>
@@ -71,7 +49,7 @@ export default function Footer({ setCurrentView, setActiveSection }) {
                 <div className="logo-title" style={{ fontSize: '1.05rem' }}>FirstBuy AI</div>
                 <div className="logo-subtitle" style={{ fontSize: '0.55rem' }}>Property × Fintech</div>
               </div>
-            </div>
+            </Link>
             
             <p className="footer-desc">
               FirstBuy AI converts your everyday spending into property credits — putting home ownership within reach, one bill at a time.
@@ -90,10 +68,10 @@ export default function Footer({ setCurrentView, setActiveSection }) {
           <div className="footer-col">
             <h4 className="footer-col-title">Product</h4>
             <ul className="footer-links-list">
-              <li><a href="#properties" onClick={(e) => { e.preventDefault(); handleNavClick('properties', 'scroll'); }}>Properties</a></li>
-              <li><a href="#dashboard" onClick={(e) => { e.preventDefault(); handleNavClick('dashboard', 'view'); }}>Dashboard</a></li>
-              <li><a href="#ai-insights" onClick={(e) => { e.preventDefault(); handleNavClick('dashboard', 'view'); }}>AI Insights</a></li>
-              <li><a href="#rewards" onClick={(e) => { e.preventDefault(); handleNavClick('rewards', 'scroll'); }}>Rewards</a></li>
+              <li><Link to="/properties">Properties</Link></li>
+              <li><Link to="/dashboard">Dashboard</Link></li>
+              <li><Link to="/dashboard">AI Insights</Link></li>
+              <li><Link to="/rewards">Rewards</Link></li>
             </ul>
           </div>
 
@@ -101,9 +79,9 @@ export default function Footer({ setCurrentView, setActiveSection }) {
           <div className="footer-col">
             <h4 className="footer-col-title">Company</h4>
             <ul className="footer-links-list">
-              <li><a href="#how-it-works" onClick={(e) => { e.preventDefault(); handleNavClick('how-it-works', 'scroll'); }}>How it works</a></li>
-              <li><a href="#reviews" onClick={(e) => { e.preventDefault(); handleNavClick('reviews', 'scroll'); }}>Reviews</a></li>
-              <li><a href="#contact" onClick={(e) => { e.preventDefault(); handleNavClick('contact', 'scroll'); }}>Contact</a></li>
+              <li><Link to="/how-it-works">How it works</Link></li>
+              <li><Link to="/reviews">Reviews</Link></li>
+              <li><Link to="/contact">Contact</Link></li>
               <li><a href="#careers">Careers</a></li>
             </ul>
           </div>
