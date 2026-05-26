@@ -1,80 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, X, Plus } from 'lucide-react';
 import '../styles/Reviews.css';
 
 export default function Reviews() {
   const [showModal, setShowModal] = useState(false);
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: 'Ananya R.',
-      role: 'Bought a 3BHK in Bengaluru',
-      stars: 5,
-      quote: 'From upload to handover — flawless. The credit calculator alone shaved ₹4.1L off my registration.'
-    },
-    {
-      id: 2,
-      name: 'Vikram S.',
-      role: 'First-time owner, Mumbai',
-      stars: 5,
-      quote: 'Builder trust scores were the deciding factor. Pulled out of a deal that later went sour. Saved my life.'
-    },
-    {
-      id: 3,
-      name: 'Sneha K.',
-      role: 'Doctor, Hyderabad',
-      stars: 4,
-      quote: "Wish I'd known about FirstBuy earlier. The AI Insights page is unreasonably good."
-    },
-    {
-      id: 4,
-      name: 'Aman D.',
-      role: 'Architect, Pune',
-      stars: 5,
-      quote: 'Looks like a luxury fintech app, behaves like a kind friend. That balance is rare.'
-    },
-    {
-      id: 5,
-      name: 'Tara M.',
-      role: 'Founder, Delhi',
-      stars: 5,
-      quote: 'I have used every property platform in India. This is the only one I open every morning.'
-    },
-    {
-      id: 6,
-      name: 'Karan V.',
-      role: 'Consultant, Gurgaon',
-      stars: 4,
-      quote: 'Genuinely useful. The home goal planner kept me grounded — and patient.'
-    }
-  ]);
+  const [reviews, setReviews] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch reviews and properties on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [revRes, propRes] = await Promise.all([
+          fetch('http://localhost:8000/api/reviews/'),
+          fetch('http://localhost:8000/api/properties/')
+        ]);
+        if (revRes.ok) {
+          const data = await revRes.json();
+          // Map backend fields to frontend props
+          setReviews(data.results || data);
+        }
+        if (propRes.ok) {
+          const pData = await propRes.json();
+          setProperties(pData.results || pData);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Modal form states
-  const [newName, setNewName] = useState('');
-  const [newRole, setNewRole] = useState('');
+  const [newPropertyId, setNewPropertyId] = useState('');
   const [newQuote, setNewQuote] = useState('');
   const [newStars, setNewStars] = useState(5);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleWriteReviewSubmit = (e) => {
+  const handleWriteReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!newName || !newQuote) return;
+    setErrorMsg('');
+    if (!newPropertyId || !newQuote) {
+      setErrorMsg('Please select a property and write a review.');
+      return;
+    }
 
-    const newReview = {
-      id: Date.now(),
-      name: newName,
-      role: newRole || 'Verified User',
-      stars: newStars,
-      quote: newQuote
-    };
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setErrorMsg('You must be logged in to write a review.');
+      return;
+    }
 
-    setReviews(prev => [newReview, ...prev]);
-    setShowModal(false);
-    
-    // Clear inputs
-    setNewName('');
-    setNewRole('');
-    setNewQuote('');
-    setNewStars(5);
+    try {
+      const res = await fetch('http://localhost:8000/api/reviews/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          property: newPropertyId,
+          rating: newStars,
+          comment: newQuote
+        })
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || Object.values(data).flat().join(', ') || 'Failed to submit review');
+      }
+
+      const createdReview = await res.json();
+      setReviews(prev => [createdReview, ...prev]);
+      setShowModal(false);
+      setNewQuote('');
+      setNewStars(5);
+      setNewPropertyId('');
+    } catch (err) {
+      setErrorMsg(err.message);
+    }
   };
 
   const getInitials = (name) => {
@@ -142,6 +149,7 @@ export default function Reviews() {
 
         {/* Testimonials Grid */}
         <div className="reviews-grid">
+          {reviews.length === 0 && <p style={{ color: '#fff' }}>No reviews yet. Be the first!</p>}
           {reviews.map((rev) => (
             <div key={rev.id} className="review-card glass-card">
               <div className="review-card-stars">
@@ -149,19 +157,19 @@ export default function Reviews() {
                   <Star
                     key={i}
                     size={14}
-                    fill={i < rev.stars ? 'currentColor' : 'none'}
-                    stroke={i < rev.stars ? 'none' : 'currentColor'}
+                    fill={i < rev.rating ? 'currentColor' : 'none'}
+                    stroke={i < rev.rating ? 'none' : 'currentColor'}
                   />
                 ))}
               </div>
               <blockquote className="review-card-quote">
-                "{rev.quote}"
+                "{rev.comment}"
               </blockquote>
               <div className="review-card-profile">
-                <div className="profile-avatar">{getInitials(rev.name)}</div>
+                <div className="profile-avatar">{getInitials(rev.user_name)}</div>
                 <div className="profile-info">
-                  <span className="profile-name">{rev.name}</span>
-                  <span className="profile-role">{rev.role}</span>
+                  <span className="profile-name">{rev.user_name}</span>
+                  <span className="profile-role">Reviewed: {rev.property_title}</span>
                 </div>
               </div>
             </div>
@@ -182,27 +190,25 @@ export default function Reviews() {
             </div>
 
             <form onSubmit={handleWriteReviewSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div className="form-group-col">
-                <label>Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Ananya R."
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="form-input-text"
-                />
-              </div>
+              {errorMsg && (
+                <div style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '8px' }}>
+                  {errorMsg}
+                </div>
+              )}
 
               <div className="form-group-col">
-                <label>Context / Location</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Bought a 3BHK in Gurgaon"
-                  value={newRole}
-                  onChange={(e) => setNewRole(e.target.value)}
-                  className="form-input-text"
-                />
+                <label>Select Property</label>
+                <select 
+                  className="form-input-text" 
+                  value={newPropertyId} 
+                  onChange={(e) => setNewPropertyId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Choose a property --</option>
+                  {properties.map(p => (
+                    <option key={p.id} value={p.id}>{p.title}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group-col">

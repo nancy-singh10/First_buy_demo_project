@@ -11,8 +11,11 @@ export default function SignUp() {
     phone: '',
     email: '',
     password: '',
+    password: '',
     confirmPassword: '',
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const roles = ['User', 'Builder', 'Owner', 'Agent'];
 
@@ -20,10 +23,71 @@ export default function SignUp() {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // For now, navigate to dashboard
-    navigate('/dashboard');
+    setError('');
+
+    // 1. Frontend validation
+    if (!form.fullName || form.fullName.trim().length < 2) {
+      setError('Please enter a valid full name (at least 2 characters)');
+      return;
+    }
+
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    if (!phoneRegex.test(form.phone.replace(/\s+/g, ''))) {
+      setError('Please enter a valid phone number (10-15 digits)');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // 2. API Request (POST /signup) -> Django backend
+      const response = await fetch('http://localhost:8000/api/auth/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          full_name: form.fullName,
+          phone: form.phone,
+          role: role.toLowerCase()
+        })
+      });
+      
+      const data = await response.json();
+      
+      // 3. Backend checks user exists, returns error if so
+      if (!response.ok) {
+        throw new Error(data.email?.[0] || data.detail || 'Registration failed');
+      }
+
+      // 4. Return success, store JWT tokens
+      localStorage.setItem('access_token', data.tokens.access);
+      localStorage.setItem('refresh_token', data.tokens.refresh);
+      
+      // 5. Navigate to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,6 +141,8 @@ export default function SignUp() {
               </button>
             ))}
           </div>
+
+          {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{error}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="signup-form-group">
@@ -149,7 +215,9 @@ export default function SignUp() {
               </div>
             </div>
 
-            <button type="submit" className="btn-signup-submit">Create Account</button>
+            <button type="submit" className="btn-signup-submit" disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
           </form>
 
           <div className="signup-footer-text">

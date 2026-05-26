@@ -14,11 +14,34 @@ export default function Contact() {
   const handleChange = (e) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
-    setForm({ firstName: '', lastName: '', email: '', role: 'future-homeowner', message: '' });
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:8000/api/contact/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${form.firstName} ${form.lastName}`.trim(),
+          email: form.email,
+          subject: `Enquiry from ${form.role}`,
+          message: form.message
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 5000);
+      setForm({ firstName: '', lastName: '', email: '', role: 'future-homeowner', message: '' });
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   /* ── Chat widget state ── */
@@ -104,6 +127,12 @@ export default function Contact() {
             {/* ── Left: Form ── */}
             <div className="contact-form-card glass-card">
               <h3 className="contact-form-title">Send us a note</h3>
+
+              {error && (
+                <div style={{ color: '#ef4444', marginBottom: '1rem', background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '8px' }}>
+                  {error}
+                </div>
+              )}
 
               {submitted ? (
                 <div className="form-success-toast">

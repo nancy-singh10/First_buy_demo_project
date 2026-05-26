@@ -7,11 +7,36 @@ export default function SignIn() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // For now, just navigate to dashboard
-    navigate('/dashboard');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Invalid email or password');
+      }
+
+      localStorage.setItem('access_token', data.access);
+      localStorage.setItem('refresh_token', data.refresh);
+      
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,6 +77,8 @@ export default function SignIn() {
             <p>Please enter your details to sign in</p>
           </div>
 
+          {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{error}</div>}
+
           <form onSubmit={handleSubmit}>
             <div className="signin-form-group">
               <label className="signin-label">Email Address</label>
@@ -87,7 +114,9 @@ export default function SignIn() {
               <button type="button" className="signin-forgot">Forgot password?</button>
             </div>
 
-            <button type="submit" className="btn-signin-submit">Sign in</button>
+            <button type="submit" className="btn-signin-submit" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
 
             <button type="button" className="btn-google" onClick={() => navigate('/dashboard')}>
               <span className="g-icon">G</span>

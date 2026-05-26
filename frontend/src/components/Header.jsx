@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { Home, Menu, X, ArrowRight } from 'lucide-react';
+import { Home, Menu, X, ArrowRight, User } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const isAuthenticated = !!localStorage.getItem('access_token');
+
+  const handleSignOut = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    setMobileMenuOpen(false);
+    navigate('/');
+  };
 
   const navItems = [
     { label: 'Home', path: '/' },
@@ -14,7 +23,7 @@ export default function Header() {
     { label: 'Rewards', path: '/rewards' },
     { label: 'Reviews', path: '/reviews' },
     { label: 'Contact', path: '/contact' },
-    { label: 'Dashboard', path: '/dashboard' },
+    ...(isAuthenticated ? [{ label: 'Dashboard', path: '/dashboard' }] : []),
   ];
 
   const handleNavClick = () => {
@@ -54,10 +63,18 @@ export default function Header() {
           </nav>
 
           <div className="header-actions">
-            <Link to="/signin" className="btn-signin">Sign In</Link>
-            <Link to="/signin" className="btn-getstarted">
-              Get Started <ArrowRight size={16} />
-            </Link>
+            {isAuthenticated ? (
+              <button onClick={handleSignOut} className="btn-signin" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>
+                Sign Out
+              </button>
+            ) : (
+              <>
+                <Link to="/signin" className="btn-signin">Sign In</Link>
+                <Link to="/signin" className="btn-getstarted">
+                  Get Started <ArrowRight size={16} />
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="mobile-toggle" onClick={() => setMobileMenuOpen(true)}>
@@ -98,12 +115,20 @@ export default function Header() {
         </ul>
 
         <div className="mobile-nav-actions">
-          <Link to="/signin" className="btn-signin" onClick={() => setMobileMenuOpen(false)} style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
-            Sign In
-          </Link>
-          <Link to="/signin" className="btn-getstarted" onClick={() => setMobileMenuOpen(false)} style={{ width: '100%', justifyContent: 'center' }}>
-            Get Started <ArrowRight size={16} />
-          </Link>
+            {isAuthenticated ? (
+              <button onClick={handleSignOut} className="btn-signin" style={{ width: '100%', textAlign: 'center', padding: '10px', background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>
+                Sign Out
+              </button>
+            ) : (
+              <>
+                <Link to="/signin" className="btn-signin" onClick={() => setMobileMenuOpen(false)} style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+                  Sign In
+                </Link>
+                <Link to="/signin" className="btn-getstarted" onClick={() => setMobileMenuOpen(false)} style={{ width: '100%', justifyContent: 'center' }}>
+                  Get Started <ArrowRight size={16} />
+                </Link>
+              </>
+            )}
         </div>
       </div>
     </>

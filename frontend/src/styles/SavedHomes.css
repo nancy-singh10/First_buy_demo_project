@@ -1,0 +1,242 @@
+/* ── SavedHomes.css ── */
+
+.sh-root {
+  padding: 2rem;
+  max-width: 1100px;
+}
+
+/* Loading */
+.sh-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  padding: 3rem;
+  font-size: 0.95rem;
+}
+.sh-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: #f472b6;
+  border-radius: 50%;
+  animation: sh-spin 0.8s linear infinite;
+}
+@keyframes sh-spin { to { transform: rotate(360deg); } }
+
+/* Header */
+.sh-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+.sh-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+}
+.sh-subtitle {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* Browse button */
+.sh-browse-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(244,114,182,0.12);
+  color: #f472b6;
+  border: 1px solid rgba(244,114,182,0.25);
+  padding: 9px 18px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.sh-browse-btn:hover {
+  background: rgba(244,114,182,0.2);
+}
+
+/* Empty state */
+.sh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 5rem 2rem;
+  text-align: center;
+}
+.sh-empty h3 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin: 0;
+}
+.sh-empty p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  max-width: 320px;
+  margin: 0;
+}
+
+/* Grid */
+.sh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Card */
+.sh-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.sh-card:hover {
+  border-color: rgba(244,114,182,0.25);
+  transform: translateY(-2px);
+}
+
+/* Image */
+.sh-img-wrap {
+  position: relative;
+  height: 180px;
+}
+.sh-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sh-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.03);
+  color: var(--text-muted);
+}
+.sh-trust-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  color: #10b981;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sh-unsave-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+.sh-unsave-btn:hover {
+  background: rgba(244,114,182,0.3);
+  transform: scale(1.1);
+}
+
+/* Body */
+.sh-body {
+  padding: 1rem 1.1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.sh-prop-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #fff;
+}
+.sh-prop-loc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Price row */
+.sh-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 4px;
+}
+.sh-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+.sh-credit-label {
+  font-size: 0.65rem;
+  color: #818cf8;
+  margin-top: 2px;
+}
+.sh-builder {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.sh-saved-on {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Remove button */
+.sh-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(244,114,182,0.2);
+  background: transparent;
+  color: #f472b6;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sh-remove-btn:hover {
+  background: rgba(244,114,182,0.1);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .sh-grid { grid-template-columns: 1fr; }
+}
