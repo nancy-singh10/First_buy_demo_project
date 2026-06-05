@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import CustomLogo from './CustomLogo';
 import '../styles/Footer.css';
 
 const TwitterIcon = ({ size = 16, ...props }) => (
@@ -42,8 +42,8 @@ export default function Footer() {
           {/* Brand details */}
           <div className="footer-brand">
             <Link to="/" className="logo">
-              <div className="logo-icon-wrapper" style={{ width: '34px', height: '34px' }}>
-                <Home size={18} color="#ffffff" />
+              <div className="logo-icon-wrapper" style={{ width: '34px', height: '34px', background: 'transparent', boxShadow: 'none' }}>
+                <CustomLogo size={28} mainColor="#ffffff" />
               </div>
               <div className="logo-text">
                 <div className="logo-title" style={{ fontSize: '1.05rem' }}>FirstBuy AI</div>

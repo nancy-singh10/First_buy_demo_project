@@ -17,7 +17,7 @@ export default function SignUp() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const roles = ['User', 'Builder', 'Owner', 'Agent'];
+  const roles = ['User', 'Builder'];
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));

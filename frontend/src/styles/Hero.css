@@ -320,52 +320,33 @@
   animation: hover-villa 4s ease-in-out infinite alternate;
 }
 
-.villa-base {
+.animated-home-core {
   position: absolute;
-  bottom: 0;
-  width: 130px;
-  height: 80px;
-  background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(59, 130, 246, 0.3) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  border-radius: 6px;
-  box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
+  animation: pulse-home 3s ease-in-out infinite alternate;
 }
 
-.villa-glass-room {
-  position: absolute;
-  top: 15px;
-  left: 20px;
-  width: 90px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(168, 85, 247, 0.6);
-  border-radius: 4px;
-  backdrop-filter: blur(2px);
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+.holo-home-svg path {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: draw-home 4s ease-in-out infinite alternate;
 }
 
-/* Indoor warm light representation */
-.villa-light {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  width: 25px;
-  height: 25px;
-  background: radial-gradient(circle, rgba(253, 224, 71, 0.6) 0%, rgba(253, 224, 71, 0) 70%);
-  border-radius: 50%;
-  animation: glow-light 2s infinite ease-in-out alternate;
+@keyframes pulse-home {
+  0% { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.4)); }
+  100% { transform: translate(-50%, -50%) scale(1.1); filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.8)); }
 }
 
-.villa-pool {
-  position: absolute;
-  bottom: 2px;
-  right: 10px;
-  width: 45px;
-  height: 15px;
-  background: rgba(59, 130, 246, 0.6);
-  border: 1px solid rgba(59, 130, 246, 0.8);
-  border-radius: 20px;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+@keyframes draw-home {
+  0% { stroke-dashoffset: 200; }
+  35% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; }
 }
 
 /* Hovering Screens (Mock UI overlays) */

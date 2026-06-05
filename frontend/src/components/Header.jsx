@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Home, Menu, X, ArrowRight, User } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
+import CustomLogo from './CustomLogo';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,8 +36,8 @@ export default function Header() {
       <header className="header">
         <div className="container header-container">
           <Link to="/" className="logo" onClick={() => setMobileMenuOpen(false)}>
-            <div className="logo-icon-wrapper">
-              <Home size={20} color="#ffffff" strokeWidth={2.5} />
+            <div className="logo-icon-wrapper" style={{ background: 'transparent', boxShadow: 'none' }}>
+              <CustomLogo size={28} mainColor="#ffffff" />
             </div>
             <div className="logo-text">
               <div className="logo-title">
@@ -90,8 +91,8 @@ export default function Header() {
       <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="mobile-nav-header">
           <Link to="/" className="logo" onClick={() => setMobileMenuOpen(false)}>
-            <div className="logo-icon-wrapper">
-              <Home size={18} color="#ffffff" />
+            <div className="logo-icon-wrapper" style={{ background: 'transparent', boxShadow: 'none' }}>
+              <CustomLogo size={24} mainColor="#ffffff" />
             </div>
             <div className="logo-title">FirstBuy AI</div>
           </Link>

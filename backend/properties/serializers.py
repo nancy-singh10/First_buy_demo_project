@@ -11,17 +11,21 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 class PropertySerializer(serializers.ModelSerializer):
     images       = PropertyImageSerializer(many=True, read_only=True)
     builder_name = serializers.CharField(source='builder.full_name', read_only=True)
+    builder_tier = serializers.CharField(source='builder.tier', read_only=True)
+    buyer_name   = serializers.CharField(source='buyer.full_name', read_only=True)
+    buyer_email  = serializers.CharField(source='buyer.email', read_only=True)
+    buyer_phone  = serializers.CharField(source='buyer.phone', read_only=True)
     is_saved     = serializers.SerializerMethodField()
 
     class Meta:
         model  = Property
         fields = (
-            'id', 'builder', 'builder_name',
+            'id', 'builder', 'builder_name', 'builder_tier',
             'title', 'description', 'price_in_inr',
             'location', 'trust_score', 'max_credit_discount_allowed',
-            'images', 'is_saved', 'created_at',
+            'images', 'is_saved', 'status', 'buyer', 'buyer_name', 'buyer_email', 'buyer_phone', 'created_at',
         )
-        read_only_fields = ('builder', 'trust_score')
+        read_only_fields = ('builder', 'trust_score', 'status', 'buyer')
 
     def get_is_saved(self, obj):
         request = self.context.get('request')

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Play, ShieldCheck, ArrowRight } from 'lucide-react';
+import CustomLogo from './CustomLogo';
 import '../styles/Hero.css';
 
 export default function Hero() {
@@ -11,10 +12,7 @@ export default function Hero() {
       <div className="container hero-grid">
         {/* Left Side: Copy and Actions */}
         <div className="hero-content">
-          <div className="beta-badge">
-            <span className="beta-dot"></span>
-            Now in private beta — backed by Series A investors
-          </div>
+
           
           <h1 className="hero-title">
             <span className="grad-1">Turn everyday</span>
@@ -76,13 +74,11 @@ export default function Hero() {
               <div className="holo-orbit-2"></div>
               <div className="holo-glow-ring"></div>
 
-              {/* CSS 3D Villa */}
+              {/* Animated Home Core */}
               <div className="css-villa">
-                <div className="villa-base"></div>
-                <div className="villa-glass-room">
-                  <div className="villa-light"></div>
+                <div className="animated-home-core">
+                  <CustomLogo size={90} mainColor="#a5b4fc" className="holo-home-svg" />
                 </div>
-                <div className="villa-pool"></div>
 
                 {/* Floating holographic screens */}
                 <div className="holo-screen-1">

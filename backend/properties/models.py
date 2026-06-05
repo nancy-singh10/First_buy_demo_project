@@ -3,6 +3,11 @@ from django.conf import settings
 
 
 class Property(models.Model):
+    STATUS_CHOICES = [
+        ('available', 'Available'),
+        ('booked', 'Booked'),
+    ]
+
     builder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'role': 'builder'}, related_name='properties')
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -10,6 +15,8 @@ class Property(models.Model):
     location = models.CharField(max_length=200)
     trust_score = models.IntegerField(default=100)  # 0 to 100
     max_credit_discount_allowed = models.DecimalField(max_digits=15, decimal_places=2, help_text="Maximum INR discount achievable via Property Credits")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
+    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='booked_properties')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

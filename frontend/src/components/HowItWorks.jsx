@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, Wallet, Building, Home, Check, Plus, AlertCircle, ArrowRight } from 'lucide-react';
+import CustomLogo from './CustomLogo';
 import '../styles/HowItWorks.css';
 
 export default function HowItWorks({ setCurrentView }) {
@@ -269,8 +270,8 @@ export default function HowItWorks({ setCurrentView }) {
             {/* Step 4: Video player with Home logo */}
             {activeStep === 3 && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="media-placeholder">
-                  <Home size={38} color="#ffffff" strokeWidth={2} />
+                <div className="media-placeholder" style={{ background: 'transparent', border: 'none' }}>
+                  <CustomLogo size={48} mainColor="#ffffff" />
                 </div>
                 <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
                   <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>Redemption Dashboard</div>

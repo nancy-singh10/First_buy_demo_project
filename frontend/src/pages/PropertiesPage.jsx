@@ -9,6 +9,7 @@ export default function PropertiesPage() {
     if (view === 'dashboard') navigate('/dashboard');
     else if (view === 'landing') navigate('/');
     else if (view === 'contact') navigate('/contact');
+    else if (view === 'signin') navigate('/signin');
   };
 
   return (

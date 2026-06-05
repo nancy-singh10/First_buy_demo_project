@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import ContactPage from './pages/ContactPage';
 import PropertiesPage from './pages/PropertiesPage';
+import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import RewardsPage from './pages/RewardsPage';
 import ReviewsPage from './pages/ReviewsPage';
@@ -19,6 +20,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/properties" element={<PropertiesPage />} />
+        <Route path="/properties/:id" element={<PropertyDetailsPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/rewards" element={<RewardsPage />} />
         <Route path="/reviews" element={<ReviewsPage />} />

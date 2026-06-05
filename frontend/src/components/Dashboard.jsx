@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import CustomLogo from './CustomLogo';
 import {
   Home, UploadCloud, LayoutGrid, Wallet, Gift, BarChart2, Heart, Users, Settings,
-  Search, Bell, Activity, ArrowRight, ShieldCheck, Star, MapPin
+  Search, Bell, Activity, ArrowRight, ShieldCheck, Star, MapPin, PlusCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css';
@@ -10,7 +11,12 @@ import ProfileSettings from './ProfileSettings';
 import AdminQueue from './AdminQueue';
 import SavedHomes from './SavedHomes';
 import WalletView from './WalletView';
-
+import AddProperty from './AddProperty';
+import MarketplacePreview from './MarketplacePreview';
+import BuilderDashboardView from './BuilderDashboardView';
+import BuilderRewards from './BuilderRewards';
+import RewardsTiers from './RewardsTiers';
+import AdminDashboardView from './AdminDashboardView';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -20,6 +26,10 @@ export default function Dashboard() {
   const [properties, setProperties] = useState([]);
   const [user, setUser]           = useState(null);
   const [savedIds, setSavedIds]   = useState(new Set()); // track saved property IDs
+
+  // Payment simulation state
+  const [paymentModalProp, setPaymentModalProp] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   /* Toggle save / unsave a demo property card */
   const toggleSave = async (propertyId) => {
@@ -39,6 +49,48 @@ export default function Dashboard() {
     }
   };
 
+  const handleBookProperty = async (propertyId) => {
+    setIsProcessing(true);
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`http://localhost:8000/api/properties/${propertyId}/book/`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        // Refresh properties
+        fetchUserData();
+        setPaymentModalProp(null);
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Error booking property');
+      }
+    } catch (err) {
+      console.error('Booking error:', err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCancelBooking = async (propertyId) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`http://localhost:8000/api/properties/${propertyId}/cancel_booking/`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        // Refresh properties
+        fetchUserData();
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Error cancelling booking');
+      }
+    } catch (err) {
+      console.error('Cancellation error:', err);
+    }
+  };
+
 
   // Build nav dynamically — admins get 'Verify Receipts' instead of 'Upload Receipt'
   const navItems = [
@@ -47,6 +99,13 @@ export default function Dashboard() {
     ...(user && user.is_staff ? [] : [{ label: 'Upload Receipt', icon: <UploadCloud size={18} /> }]),
     // Only show Verify Receipts tab for admin/staff
     ...(user && user.is_staff ? [{ label: 'Verify Receipts', icon: <ShieldCheck size={18} /> }] : []),
+    ...(user && user.role === 'builder' ? [
+      { label: 'Add Property', icon: <PlusCircle size={18} /> },
+      { label: 'My Listings', icon: <LayoutGrid size={18} /> }
+    ] : []),
+    ...(user && !user.is_staff && user.role === 'user' ? [
+      { label: 'Subscription', icon: <Star size={18} /> }
+    ] : []),
     { label: 'Properties',     icon: <Home size={18} /> },
     { label: 'Wallet',         icon: <Wallet size={18} /> },
     { label: 'Rewards',        icon: <Gift size={18} /> },
@@ -81,11 +140,13 @@ export default function Dashboard() {
         }
 
         // Fetch Properties
-        const propsRes = await fetch('http://localhost:8000/api/properties/');
+        const propsRes = await fetch('http://localhost:8000/api/properties/', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (propsRes.ok) {
           const propsData = await propsRes.json();
           const propsArray = propsData.results || propsData;
-          setProperties(propsArray.slice(0, 3));
+          setProperties(propsArray);
           
           // Seed the savedIds set for properties the user already saved
           if (token) {
@@ -134,6 +195,28 @@ export default function Dashboard() {
     setUnreadCount(0);
   };
 
+  const handleSubscribe = async (tier) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/auth/subscribe/', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tier })
+      });
+      if (res.ok) {
+        alert(`Successfully subscribed to ${tier.toUpperCase()} tier!`);
+        fetchUserData(); // Refresh user data to get new tier
+      } else {
+        alert('Subscription failed.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // Helper to format currency
   const formatINR = (amount) => {
     const num = parseFloat(amount);
@@ -148,8 +231,8 @@ export default function Dashboard() {
       {/* ── Sidebar ── */}
       <aside className="db-sidebar">
         <div className="db-brand" onClick={() => navigate('/')}>
-          <div className="logo-icon-wrapper" style={{ width: '32px', height: '32px', borderRadius: '8px' }}>
-            <Home size={16} color="#ffffff" strokeWidth={2.5} />
+          <div className="logo-icon-wrapper" style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'transparent', boxShadow: 'none' }}>
+            <CustomLogo size={24} mainColor="#ffffff" />
           </div>
           <div className="logo-text">
             <div className="logo-title" style={{ fontSize: '1rem' }}>FirstBuy <span className="logo-badge">AI</span></div>
@@ -169,11 +252,13 @@ export default function Dashboard() {
           ))}
         </nav>
 
-        <div className="db-platinum-card">
-          <h4>Go Platinum</h4>
-          <p>Unlock 2x credits & premium listings.</p>
-          <button className="btn-platinum">Upgrade</button>
-        </div>
+        {user && user.role === 'user' && user.tier !== 'platinum' && (
+          <div className="db-platinum-card">
+            <h4>Upgrade Tier</h4>
+            <p>Unlock higher credit multipliers & premium perks.</p>
+            <button className="btn-platinum" onClick={() => setActiveTab('Subscription')}>Upgrade</button>
+          </div>
+        )}
       </aside>
 
       {/* ── Main Canvas ── */}
@@ -195,13 +280,39 @@ export default function Dashboard() {
           <p style={{ color: 'var(--text-muted)' }}>Welcome back,</p>
           <h1>{user ? (user.full_name ? user.full_name.split(' ')[0] : 'Admin') : 'Nancy'} 👏</h1>
           {user && (
-            <span style={{
-              display: 'inline-block', padding: '4px 10px', borderRadius: '20px',
-              fontSize: '0.75rem', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8',
-              fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '1rem'
-            }}>
-              {user.role} {user.is_staff ? '(Admin)' : ''}
-            </span>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem', alignItems: 'center' }}>
+              <span style={{
+                display: 'inline-block', padding: '4px 10px', borderRadius: '20px',
+                fontSize: '0.75rem', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8',
+                fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px'
+              }}>
+                {user.role} {user.is_staff ? '(Admin)' : ''}
+              </span>
+              
+              {user.tier && (
+                <span style={{
+                  display: 'inline-block', padding: '4px 10px', borderRadius: '20px',
+                  fontSize: '0.75rem', 
+                  background: user.tier === 'platinum' ? 'rgba(168, 85, 247, 0.15)' : 
+                              user.tier === 'gold' ? 'rgba(234, 179, 8, 0.15)' : 
+                              user.tier === 'silver' ? 'rgba(148, 163, 184, 0.15)' : 
+                              'rgba(217, 119, 6, 0.15)', 
+                  color: user.tier === 'platinum' ? '#c084fc' : 
+                         user.tier === 'gold' ? '#facc15' : 
+                         user.tier === 'silver' ? '#cbd5e1' : 
+                         '#d97706',
+                  fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px',
+                  border: `1px solid ${
+                    user.tier === 'platinum' ? 'rgba(192, 132, 252, 0.3)' : 
+                    user.tier === 'gold' ? 'rgba(250, 204, 21, 0.3)' : 
+                    user.tier === 'silver' ? 'rgba(203, 213, 225, 0.3)' : 
+                    'rgba(217, 119, 6, 0.3)'
+                  }`
+                }}>
+                  {user.tier} Tier
+                </span>
+              )}
+            </div>
           )}
           <p>Here's your home-ownership journey this month.</p>
         </div>
@@ -212,10 +323,167 @@ export default function Dashboard() {
           <ProfileSettings />
         ) : activeTab === 'Upload Receipt' ? (
           <ReceiptUpload />
+        ) : activeTab === 'Add Property' && user && user.role === 'builder' ? (
+          <AddProperty onPropertyAdded={() => setActiveTab('Properties')} />
         ) : activeTab === 'Saved Homes' ? (
           <SavedHomes onBrowse={() => setActiveTab('Properties')} />
+        ) : activeTab === 'Subscription' && user && user.role === 'user' ? (
+          <div className="db-subscription-container" style={{ padding: '2rem 0' }}>
+            <div className="db-chart-header" style={{ marginBottom: '2rem' }}>
+              <div>
+                <h3 className="db-chart-title" style={{ fontSize: '1.5rem' }}>Upgrade Your Tier</h3>
+                <p className="db-chart-subtitle">Multiply your credit earnings and unlock premium perks.</p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+              {/* Bronze */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '2rem', border: user.tier === 'bronze' ? '2px solid #818cf8' : '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
+                {user.tier === 'bronze' && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#818cf8', color: '#fff', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>CURRENT PLAN</div>}
+                <h4 style={{ color: '#d97706', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Bronze</h4>
+                <div style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>Free</div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', height: '40px' }}>Default tier for all new users.</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, gap: '10px', display: 'flex', flexDirection: 'column' }}>
+                  <li><ShieldCheck size={16} color="#10b981" /> <strong>1x</strong> Credit Multiplier</li>
+                  <li><ShieldCheck size={16} color="#10b981" /> Basic Insights</li>
+                </ul>
+                <button disabled style={{ width: '100%', marginTop: '2rem', padding: '0.8rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '8px', color: '#fff' }}>
+                  {user.tier === 'bronze' ? 'Active' : 'Included'}
+                </button>
+              </div>
+
+              {/* Silver */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '2rem', border: user.tier === 'silver' ? '2px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
+                {user.tier === 'silver' && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#cbd5e1', color: '#000', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>CURRENT PLAN</div>}
+                <h4 style={{ color: '#cbd5e1', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Silver</h4>
+                <div style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>Earned</div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', height: '40px' }}>Unlocks automatically after 50,000 credits.</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, gap: '10px', display: 'flex', flexDirection: 'column' }}>
+                  <li><ShieldCheck size={16} color="#10b981" /> <strong>1.25x</strong> Credit Multiplier</li>
+                  <li><ShieldCheck size={16} color="#10b981" /> Priority OCR Processing</li>
+                </ul>
+                <button disabled style={{ width: '100%', marginTop: '2rem', padding: '0.8rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '8px', color: '#fff' }}>
+                  {user.tier === 'silver' ? 'Active' : (parseFloat(user.total_credits) >= 50000 ? 'Unlocked' : `Need ${(50000 - parseFloat(user.total_credits)).toLocaleString()} more`)}
+                </button>
+              </div>
+
+              {/* Gold */}
+              <div style={{ background: 'rgba(234,179,8,0.05)', borderRadius: '16px', padding: '2rem', border: user.tier === 'gold' ? '2px solid #facc15' : '1px solid rgba(250,204,21,0.3)', position: 'relative' }}>
+                {user.tier === 'gold' && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#facc15', color: '#000', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>CURRENT PLAN</div>}
+                <h4 style={{ color: '#facc15', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Gold</h4>
+                <div style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>₹999<span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400 }}>/mo</span></div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', height: '40px' }}>For serious home buyers.</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, gap: '10px', display: 'flex', flexDirection: 'column' }}>
+                  <li><ShieldCheck size={16} color="#10b981" /> <strong>1.5x</strong> Credit Multiplier</li>
+                  <li><ShieldCheck size={16} color="#10b981" /> Concierge Support</li>
+                </ul>
+                <button 
+                  onClick={() => handleSubscribe('gold')}
+                  disabled={user.tier === 'gold' || user.tier === 'platinum'} 
+                  style={{ width: '100%', marginTop: '2rem', padding: '0.8rem', background: user.tier === 'gold' ? 'rgba(255,255,255,0.1)' : '#ca8a04', border: 'none', borderRadius: '8px', color: '#fff', cursor: (user.tier === 'gold' || user.tier === 'platinum') ? 'not-allowed' : 'pointer' }}
+                >
+                  {user.tier === 'gold' ? 'Active' : user.tier === 'platinum' ? 'Included' : 'Subscribe Now'}
+                </button>
+              </div>
+
+              {/* Platinum */}
+              <div style={{ background: 'rgba(168,85,247,0.08)', borderRadius: '16px', padding: '2rem', border: user.tier === 'platinum' ? '2px solid #c084fc' : '1px solid rgba(192,132,252,0.4)', position: 'relative' }}>
+                {user.tier === 'platinum' && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#c084fc', color: '#000', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>CURRENT PLAN</div>}
+                <h4 style={{ color: '#c084fc', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Platinum</h4>
+                <div style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>₹2,499<span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400 }}>/mo</span></div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', height: '40px' }}>The ultimate home buying experience.</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, gap: '10px', display: 'flex', flexDirection: 'column' }}>
+                  <li><ShieldCheck size={16} color="#10b981" /> <strong>2.0x</strong> Credit Multiplier</li>
+                  <li><ShieldCheck size={16} color="#10b981" /> Early access to listings</li>
+                </ul>
+                <button 
+                  onClick={() => handleSubscribe('platinum')}
+                  disabled={user.tier === 'platinum'} 
+                  style={{ width: '100%', marginTop: '2rem', padding: '0.8rem', background: user.tier === 'platinum' ? 'rgba(255,255,255,0.1)' : '#9333ea', border: 'none', borderRadius: '8px', color: '#fff', cursor: user.tier === 'platinum' ? 'not-allowed' : 'pointer', boxShadow: user.tier !== 'platinum' ? '0 4px 15px rgba(147,51,234,0.4)' : 'none' }}
+                >
+                  {user.tier === 'platinum' ? 'Active' : 'Subscribe Now'}
+                </button>
+              </div>
+            </div>
+          </div>
         ) : activeTab === 'Wallet' ? (
           <WalletView user={user} onUpdateUser={fetchUserData} />
+        ) : activeTab === 'Rewards' ? (
+          user && user.role === 'builder' ? <BuilderRewards properties={properties} user={user} /> : <RewardsTiers user={user} />
+        ) : activeTab === 'Properties' ? (
+          <MarketplacePreview setCurrentView={(view) => {
+            if (view === 'dashboard') setActiveTab('Dashboard');
+            else if (view === 'signin') navigate('/signin');
+            else navigate('/' + view);
+          }} />
+        ) : activeTab === 'My Listings' && user && user.role === 'builder' ? (
+          <div style={{ marginTop: '0.5rem' }}>
+            <div className="db-prop-header">
+              <div>
+                <h3 className="db-chart-title" style={{ fontSize: '1.25rem' }}>My Listings</h3>
+                <p className="db-chart-subtitle">All properties you have added</p>
+              </div>
+              <button className="btn-primary" onClick={() => setActiveTab('Add Property')} style={{ padding: '8px 16px', borderRadius: '8px', background: '#3b82f6', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                + New Property
+              </button>
+            </div>
+            {properties.filter(p => p.builder === user.id).length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', padding: '2rem 0' }}>You haven't listed any properties yet.</div>
+            ) : (
+              <div className="db-prop-grid">
+                {properties.filter(p => p.builder === user.id).map(p => {
+                  const fallbackImg = p.title.includes('Skyline') ? '/property_skyline_residences.png' :
+                                      p.title.includes('Azure')   ? '/property_azure_villa.png' :
+                                      '/property_altura_penthouse.png';
+                  return (
+                    <div key={p.id} className="db-prop-card">
+                      <div className="db-prop-img-container">
+                        <img src={p.images?.[0]?.image || fallbackImg} alt={p.title} className="db-prop-img" />
+                        <div className="db-prop-tag" style={{ background: p.status === 'booked' ? 'rgba(16,185,129,0.9)' : 'rgba(13,11,35,0.85)' }}>
+                          {p.status === 'booked' ? 'Booked' : 'Available'}
+                        </div>
+                      </div>
+                      <div className="db-prop-body">
+                        <div className="db-prop-title-row">
+                          <span className="db-prop-title">{p.title}</span>
+                          <span className="db-prop-rating"><ShieldCheck size={10} color="#10b981" /> {p.trust_score}</span>
+                        </div>
+                        <div className="db-prop-loc"><MapPin size={12} /> {p.location}</div>
+                        <div className="db-prop-price-row">
+                          <div>
+                            <div className="db-prop-price">{formatINR(p.price_in_inr)}</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="db-prop-btn"
+                            style={{ flex: 1, color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                            onClick={async () => {
+                              if (!window.confirm('Delete this property?')) return;
+                              try {
+                                const res = await fetch(`http://localhost:8000/api/properties/${p.id}/`, {
+                                  method: 'DELETE',
+                                  headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+                                });
+                                if (res.ok) fetchUserData();
+                                else alert('Failed to delete property.');
+                              } catch (err) { console.error(err); }
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'Dashboard' && user && user.role === 'builder' ? (
+          <BuilderDashboardView properties={properties} setActiveTab={setActiveTab} user={user} />
+        ) : activeTab === 'Dashboard' && user && user.is_staff ? (
+          <AdminDashboardView setActiveTab={setActiveTab} />
         ) : (
           <>
             {/* Stats Row */}
@@ -477,7 +745,7 @@ export default function Dashboard() {
               </div>
 
               <div className="db-prop-grid">
-                {properties.map((p) => {
+                {properties.slice(0, 3).map((p) => {
                   const fallbackImg = p.title.includes('Skyline') ? '/property_skyline_residences.png' :
                                       p.title.includes('Azure')   ? '/property_azure_villa.png' :
                                       '/property_altura_penthouse.png';
@@ -516,10 +784,37 @@ export default function Dashboard() {
                           <div className="db-prop-credit-amt">{formatINR(p.max_credit_discount_allowed)} applicable</div>
                         </div>
                       </div>
-                      <button
-                        className="db-prop-btn"
-                        onClick={() => setActiveTab('Saved Homes')}
-                      >View details</button>
+                      
+                      {p.status === 'booked' ? (
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="db-prop-btn"
+                            style={{ background: '#10b981', color: '#fff', flex: 1, cursor: 'default' }}
+                          >
+                            Booked by You
+                          </button>
+                          <button
+                            className="db-prop-btn"
+                            style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', flex: 1 }}
+                            onClick={() => handleCancelBooking(p.id)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="db-prop-btn"
+                            onClick={() => setActiveTab('Saved Homes')}
+                            style={{ flex: 1 }}
+                          >Details</button>
+                          <button
+                            className="db-prop-btn"
+                            style={{ background: '#3b82f6', color: '#fff', flex: 1 }}
+                            onClick={() => setPaymentModalProp(p)}
+                          >Book Now</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )})}
@@ -529,6 +824,48 @@ export default function Dashboard() {
         )}
 
       </main>
+
+      {/* Simulated Payment Modal */}
+      {paymentModalProp && (
+        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="modal-content glass-card" style={{ padding: '2rem', width: '90%', maxWidth: '400px', position: 'relative' }}>
+            <h3 style={{ marginTop: 0 }}>Complete Booking</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              You are about to book <strong>{paymentModalProp.title}</strong> for {formatINR(paymentModalProp.price_in_inr)}.
+            </p>
+            
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Booking Amount</span>
+                <span>₹1,00,000 (Refundable)</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Payment Method</span>
+                <span>Visa ending in 4242</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                className="btn-outline" 
+                style={{ flex: 1 }} 
+                onClick={() => setPaymentModalProp(null)}
+                disabled={isProcessing}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn-primary" 
+                style={{ flex: 1, background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }} 
+                onClick={() => handleBookProperty(paymentModalProp.id)}
+                disabled={isProcessing}
+              >
+                {isProcessing ? 'Processing...' : 'Pay & Book'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

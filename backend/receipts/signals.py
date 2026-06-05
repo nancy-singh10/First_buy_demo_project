@@ -24,11 +24,11 @@ def process_receipt_status_change(sender, instance, **kwargs):
     if old_receipt.status != 'approved' and instance.status == 'approved':
         user = instance.user
 
-        # 5% base yield with tier multiplier
-        base_credits = instance.amount_spent * Decimal('0.05')
+        # 100% base yield (1 rupee = 1 credit) with tier multiplier
+        base_credits = instance.amount_spent * Decimal('1.0')
         multipliers  = {
             'bronze':   Decimal('1.0'),
-            'silver':   Decimal('1.2'),
+            'silver':   Decimal('1.25'),
             'gold':     Decimal('1.5'),
             'platinum': Decimal('2.0'),
         }
@@ -43,8 +43,12 @@ def process_receipt_status_change(sender, instance, **kwargs):
             description      = f"Earned from receipt at {instance.store_name}",
         )
 
-        # Update user total
+        # Update user total and handle auto-upgrade to Silver
         user.total_credits += final_credits
+        
+        if user.role == 'user' and user.tier == 'bronze' and user.total_credits >= Decimal('50000'):
+            user.tier = 'silver'
+
         user.save()
 
         # ── Notification ──
