@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CustomLogo from './CustomLogo';
 import {
   Home, UploadCloud, LayoutGrid, Wallet, Gift, BarChart2, Heart, Users, Settings,
-  Search, Bell, Activity, ArrowRight, ShieldCheck, Star, MapPin, PlusCircle
+  Search, Bell, Activity, ArrowRight, ShieldCheck, Star, MapPin, PlusCircle, UserPlus
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css';
@@ -17,6 +17,7 @@ import BuilderDashboardView from './BuilderDashboardView';
 import BuilderRewards from './BuilderRewards';
 import RewardsTiers from './RewardsTiers';
 import AdminDashboardView from './AdminDashboardView';
+import FamilyPool from './FamilyPool';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -109,6 +110,7 @@ export default function Dashboard() {
     { label: 'Properties',     icon: <Home size={18} /> },
     { label: 'Wallet',         icon: <Wallet size={18} /> },
     { label: 'Rewards',        icon: <Gift size={18} /> },
+    ...(user && !user.is_staff && user.role === 'user' ? [{ label: 'Family Pool', icon: <UserPlus size={18} /> }] : []),
     { label: 'AI Insights',    icon: <BarChart2 size={18} /> },
     { label: 'Saved Homes',    icon: <Heart size={18} /> },
     { label: 'Community',      icon: <Users size={18} /> },
@@ -406,6 +408,8 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        ) : activeTab === 'Family Pool' ? (
+          <FamilyPool user={user} />
         ) : activeTab === 'Wallet' ? (
           <WalletView user={user} onUpdateUser={fetchUserData} />
         ) : activeTab === 'Rewards' ? (

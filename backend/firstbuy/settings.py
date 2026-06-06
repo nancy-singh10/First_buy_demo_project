@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'reviews',
     'contact',
     'notifications',
+    'familypool',
 ]
 
 MIDDLEWARE = [
