@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, MapPin, ShieldCheck, Star, Trash2, Home, ArrowRight } from 'lucide-react';
+import { Heart, MapPin, ShieldCheck, Star, Trash2, Home, ArrowRight, TrendingUp, Target, Wallet } from 'lucide-react';
 import '../styles/SavedHomes.css';
 
 const API = 'http://localhost:8000';
 
-export default function SavedHomes({ onBrowse }) {
+export default function SavedHomes({ onBrowse, user }) {
   const [saved, setSaved]     = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +42,16 @@ export default function SavedHomes({ onBrowse }) {
     }
   };
 
+  // ── Formatting helpers ──
+  const formatINR = (val) => {
+    const num = parseFloat(val);
+    if (num >= 10000000) return `₹${(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `₹${(num / 100000).toFixed(2)} L`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
+
+  const userCredits = parseFloat(user?.total_credits || 0);
+
   if (loading) return (
     <div className="sh-loading">
       <div className="sh-spinner" />
@@ -62,6 +72,23 @@ export default function SavedHomes({ onBrowse }) {
           Browse more <ArrowRight size={14} />
         </button>
       </div>
+
+      {/* Wallet Balance Banner */}
+      {saved.length > 0 && (
+        <div className="sh-wallet-banner">
+          <div className="sh-wallet-icon-wrap">
+            <Wallet size={20} />
+          </div>
+          <div className="sh-wallet-info">
+            <span className="sh-wallet-label">Your FirstBuy Credit Balance</span>
+            <span className="sh-wallet-value">{formatINR(userCredits)}</span>
+          </div>
+          <div className="sh-wallet-hint">
+            <TrendingUp size={14} />
+            Every receipt moves you closer to your dream home
+          </div>
+        </div>
+      )}
 
       {/* Empty state */}
       {saved.length === 0 && (
@@ -87,6 +114,21 @@ export default function SavedHomes({ onBrowse }) {
           const imgSrc = primaryImg
             ? (primaryImg.startsWith('http') ? primaryImg : `${API}${primaryImg}`)
             : null;
+
+          // ── Progress Meter Calculations ──
+          const homePrice = parseFloat(prop.price_in_inr) || 0;
+          const downPaymentNeeded = parseFloat(prop.max_credit_discount_allowed) || 0;
+          const progressPercent = downPaymentNeeded > 0
+            ? Math.min((userCredits / downPaymentNeeded) * 100, 100)
+            : 0;
+          const remaining = Math.max(downPaymentNeeded - userCredits, 0);
+          const isComplete = progressPercent >= 100;
+
+          // Dynamic color based on progress
+          const progressColor = isComplete ? '#10b981'
+            : progressPercent >= 50 ? '#3b82f6'
+            : progressPercent >= 20 ? '#8b5cf6'
+            : '#f472b6';
 
           return (
             <div key={id} className="sh-card">
@@ -117,13 +159,77 @@ export default function SavedHomes({ onBrowse }) {
 
                 <div className="sh-price-row">
                   <div>
-                    <div className="sh-price">₹{parseFloat(prop.price_in_inr).toLocaleString('en-IN')}</div>
+                    <div className="sh-price">{formatINR(homePrice)}</div>
                     <div className="sh-credit-label">
-                      Up to ₹{parseFloat(prop.max_credit_discount_allowed).toLocaleString('en-IN')} via credits
+                      Down payment via credits: {formatINR(downPaymentNeeded)}
                     </div>
                   </div>
                   <div className="sh-builder">{prop.builder_name}</div>
                 </div>
+
+                {/* ═══ HOME PROGRESS METER ═══ */}
+                <div className="sh-progress-meter">
+                  <div className="sh-progress-header">
+                    <div className="sh-progress-title-row">
+                      <Target size={14} color={progressColor} />
+                      <span className="sh-progress-title">Home Progress Meter</span>
+                    </div>
+                    <span className="sh-progress-percent" style={{ color: progressColor }}>
+                      {progressPercent.toFixed(1)}%
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="sh-progress-track">
+                    <div
+                      className="sh-progress-fill"
+                      style={{
+                        width: `${progressPercent}%`,
+                        background: isComplete
+                          ? 'linear-gradient(90deg, #10b981, #34d399)'
+                          : `linear-gradient(90deg, ${progressColor}, ${progressColor}dd)`
+                      }}
+                    >
+                      {progressPercent >= 8 && (
+                        <div className="sh-progress-fill-glow" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="sh-progress-details">
+                    <div className="sh-progress-detail">
+                      <span className="sh-detail-label">Dream Home Price</span>
+                      <span className="sh-detail-value">{formatINR(homePrice)}</span>
+                    </div>
+                    <div className="sh-progress-detail">
+                      <span className="sh-detail-label">Down Payment Needed</span>
+                      <span className="sh-detail-value" style={{ color: '#c084fc' }}>{formatINR(downPaymentNeeded)}</span>
+                    </div>
+                    <div className="sh-progress-detail">
+                      <span className="sh-detail-label">Your Credit Balance</span>
+                      <span className="sh-detail-value" style={{ color: '#34d399' }}>{formatINR(userCredits)}</span>
+                    </div>
+                    <div className="sh-progress-detail">
+                      <span className="sh-detail-label">{isComplete ? '✅ Ready!' : 'Still Needed'}</span>
+                      <span className="sh-detail-value" style={{ color: isComplete ? '#10b981' : '#f472b6' }}>
+                        {isComplete ? 'Goal reached!' : formatINR(remaining)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Motivational tag */}
+                  <div className="sh-progress-tag" style={{ borderColor: `${progressColor}33`, color: progressColor }}>
+                    {isComplete
+                      ? '🎉 You have enough credits for this down payment!'
+                      : progressPercent >= 50
+                        ? '🔥 You\'re over halfway there — keep going!'
+                        : progressPercent >= 10
+                          ? '📈 Great progress! Every receipt moves you closer.'
+                          : '🚀 Start uploading receipts to build your progress!'}
+                  </div>
+                </div>
+                {/* ═══ END PROGRESS METER ═══ */}
 
                 <div className="sh-saved-on">
                   Saved on {new Date(saved_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}

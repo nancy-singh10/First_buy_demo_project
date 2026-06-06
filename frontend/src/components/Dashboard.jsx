@@ -328,7 +328,7 @@ export default function Dashboard() {
         ) : activeTab === 'Add Property' && user && user.role === 'builder' ? (
           <AddProperty onPropertyAdded={() => setActiveTab('Properties')} />
         ) : activeTab === 'Saved Homes' ? (
-          <SavedHomes onBrowse={() => setActiveTab('Properties')} />
+          <SavedHomes onBrowse={() => setActiveTab('Properties')} user={user} />
         ) : activeTab === 'Subscription' && user && user.role === 'user' ? (
           <div className="db-subscription-container" style={{ padding: '2rem 0' }}>
             <div className="db-chart-header" style={{ marginBottom: '2rem' }}>
