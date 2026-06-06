@@ -41,7 +41,7 @@ export default function Header() {
             </div>
             <div className="logo-text">
               <div className="logo-title">
-                FirstBuy <span className="logo-badge">AI</span>
+                FirstBuy 
               </div>
               <div className="logo-subtitle">Property × Fintech</div>
             </div>
@@ -94,7 +94,7 @@ export default function Header() {
             <div className="logo-icon-wrapper" style={{ background: 'transparent', boxShadow: 'none' }}>
               <CustomLogo size={24} mainColor="#ffffff" />
             </div>
-            <div className="logo-title">FirstBuy AI</div>
+            <div className="logo-title">FirstBuy</div>
           </Link>
           <button className="mobile-close" onClick={() => setMobileMenuOpen(false)} style={{ color: '#fff' }}>
             <X size={24} />
